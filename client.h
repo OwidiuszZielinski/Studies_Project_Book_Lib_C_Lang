@@ -181,4 +181,44 @@ int readFromFile(Queue *head, Queue *tail, char *fileName)
 }
 
 
+void clientsMenu()
+{
+    int choice;
+    Queue P, K;
+    do
+    {
+        printf("Wybierz operacje:\n");
+        printf("1. Dodaj klienta\n");
+        printf("2. Usuń klienta\n");
+        printf("3. Edytuj\n");
+        printf("4. Wczytaj istniejących \n");
+        printf("5. Cofnij \n");
+        printf("Twoj wybor: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+        case 1:
+
+            P = NULL;
+            readFromFile(&P, &K, fileNameP);
+            addClients(&P, &K);
+            printf("\nWprowadzone dane:\n");
+            showQueue(P);
+            saveToFile(P, fileNameP);
+            break;
+        case 2:
+
+            break;
+        case 3:
+
+            break;
+        case 4:
+            break;
+        default:
+            printf("Nieprawidłowy wybor.\n");
+            break;
+        }
+    } while (choice != 5);
+}
 
