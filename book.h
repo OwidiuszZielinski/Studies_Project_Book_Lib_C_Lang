@@ -1,195 +1,220 @@
-#include <stdlib.h>
 #include <stdio.h>
-#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define SIZE 25
-
-typedef struct
-{
-    char title[SIZE], isbn[SIZE];
-    int quantity, year;
-
+typedef struct {
+    int id;
+    char title[100];
+    char ISBN[20];
+    int releaseYear;
+    int quantity;
 } Book;
 
-typedef struct NodeBook
-{
-    Book Book;
-    struct NodeBook *next;
-} NodeBook;
+typedef struct BookNode {
+    Book book;
+    struct BookNode* next;
+} BookNode;
 
-typedef NodeBook *QueueBook;
+char *fileNameB = "books.txt";
 
-Book newBook()
-{
-    Book x;
+BookNode* createBookNode(Book book) {
+    BookNode* newBookNode = (BookNode*)malloc(sizeof(BookNode));
+    if (newBookNode != NULL) {
+        newBookNode->book = book;
+        newBookNode->next = NULL;
+    }
+    return newBookNode;
+}
+
+void insertAtEnd(BookNode** head, Book book) {
+    BookNode* newBookNode = createBookNode(book);
+    if (newBookNode == NULL) {
+        printf("Błąd przy tworzeniu nowego węzła.\n");
+        return;
+    }
+    if (*head == NULL) {
+        newBookNode->book.id = 1;
+        *head = newBookNode;
+    } else {
+        BookNode* temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        newBookNode->book.id = temp->book.id + 1;
+        temp->next = newBookNode;
+    }
+}
+
+
+void removeById(BookNode** head, int id) {
+    if (*head == NULL) {
+        printf("Lista jest pusta.\n");
+        return;
+    }
+
+    BookNode* temp = *head;
+    BookNode* prev = NULL;
+
+    if (temp->book.id == id) {
+        *head = temp->next;
+        free(temp);
+        printf("Książka o id %d została usunięta.\n", id);
+        return;
+    }
+
+    while (temp != NULL && temp->book.id != id) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Książka o id %d nie została znaleziona.\n", id);
+        return;
+    }
+
+    prev->next = temp->next;
+    free(temp);
+    printf("Książka o id %d została usunięta.\n", id);
+}
+
+void editById(BookNode* head, int id) {
+    BookNode* temp = head;
+
+    while (temp != NULL && temp->book.id != id) {
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Książka o id %d nie została znaleziona.\n", id);
+        return;
+    }
+
+    printf("Podaj nowe wartości dla książki o id %d:\n", id);
     printf("Tytuł: ");
-    scanf("%s", x.title);
-    printf("13 - Liczbowy ISBN : \n");
-    scanf("%s", x.isbn);
-    printf("Rok: \n");
-    scanf("%d", &x.year);
-    printf("Ilość \n ");
-    scanf("%d", &x.quantity);
+    scanf("%s", temp->book.title);
+    printf("ISBN: ");
+    scanf("%s", temp->book.ISBN);
+    printf("Rok wydania: ");
+    scanf("%d", &temp->book.releaseYear);
+    printf("Ilość: ");
+    scanf("%d", &temp->book.quantity);
 
-   
-
-    return x;
+    printf("Książka o id %d została zaktualizowana.\n", id);
 }
 
-void showBook(Book x)
-{
-    printf("%s %s %d %d r.", x.isbn, x.title, x.quantity, x.year);
-}
-
-void addToQueueBookBook(QueueBook *head, QueueBook *tail, Book x)
-{
-    QueueBook Q;
-    Q = (NodeBook *)malloc(sizeof(NodeBook));
-    Q->Book = x;
-    Q->next = NULL;
-    if ((*head) == NULL)
-        (*head) = Q;
-    else
-        (*tail)->next = Q;
-    (*tail) = Q;
-}
-
-void deleteFromQueueBook(QueueBook *head, Book *x)
-{
-    QueueBook Q;
-    if ((*head) == NULL)
+void displayList(BookNode* head) {
+    if (head == NULL) {
+        printf("Lista jest pusta.\n");
         return;
-    (*x) = (*head)->Book;
-    Q = (*head);
-    (*head) = (*head)->next;
-    free(Q);
-}
-void addBooks(QueueBook *head, QueueBook *tail)
-{
-    char z;
-    printf("Czy chcesz dodac nową ksiązke? (T/N): ");
-    do
-    {
-        z = toupper(getchar());
-    } while (z != 'T' && z != 'N');
-    printf("%c\n", z);
-    if (z == 'N')
-        return;
-    do
-    {
-        printf("\nWprowadz dane ksiązki: \n");
+    }
 
-        addToQueueBookBook(&(*head), &(*tail), newBook());
-        printf("Czy chcesz dodac kolejną ksiązke? (T/N):");
-        do
-        {
-            z = toupper(getchar());
-        } while (z != 'T' && z != 'N');
-        printf("%c\n", z);
-    } while (z != 'N');
-}
-Book deletedFromQueueBookBook(QueueBook *head)
-{
-    QueueBook Q;
-    Book x;
-    if (*head == NULL)
-        return x;
-    x = (*head)->Book;
-    Q = (*head);
-    (*head) = Q;
-    free(Q);
-    return x;
-}
-void showQueueBookBook(QueueBook P)
-{
-    while (P != NULL)
-    {
-        showBook(P->Book);
-        P = P->next;
+    BookNode* temp = head;
+    while (temp != NULL) {
+        printf("ID: %d, Tytuł: %s, ISBN: %s, Rok wydania: %d, Ilość: %d\n",
+               temp->book.id, temp->book.title, temp->book.ISBN, temp->book.releaseYear, temp->book.quantity);
+        temp = temp->next;
     }
 }
-int saveToFileBook(QueueBook Q, char *filetitle)
-{
-    FILE *file;
-    file = fopen(filetitle, "w");
-    if (file == NULL)
-        return -1;
 
-    while (Q != NULL)
-    {
-        fprintf(file, "%s\n%s\n%d\n%d", Q->Book.isbn, Q->Book.title, Q->Book.year,Q->Book.quantity);
-        
-
-        Q = Q->next;
+void saveToFileBooks(BookNode* head, const char* filename) {
+    FILE* file = fopen(filename, "wb");
+    if (file == NULL) {
+        printf("Błąd przy otwieraniu pliku do zapisu.\n");
+        return;
     }
-    fclose(file);
-    return 0;
-}
 
-int readFromFileBook(QueueBook *head, QueueBook *tail, char *filetitle)
-{
-    FILE *file;
-    Book x;
-    int temp;
-    file = fopen(filetitle, "r");
-    if (file == NULL)
-        return -1;
-
-    while (!feof(file))
-    {
-
-        fscanf(file, "%s\n", x.isbn);
-        fscanf(file, "%s\n", x.title);
-        fscanf(file, "%d\n", &x.year);
-        fscanf(file, "%d\n", &x.quantity);
-        addToQueueBookBook(&(*head), &(*tail), x);
+    BookNode* temp = head;
+    while (temp != NULL) {
+        fwrite(&(temp->book), sizeof(Book), 1, file);
+        temp = temp->next;
     }
 
     fclose(file);
-    return 0;
+    printf("Dane zostały zapisane do pliku %s.\n", filename);
 }
 
-Book newBook();
-Book usnietyZKolejkiBook(QueueBook *head);
-char *filetitleP = "Books.txt";
+void loadFromFile(BookNode** head, const char* filename) {
+    FILE* file = fopen(filename, "rb");
+    if (file == NULL) {
+        printf("Błąd przy otwieraniu pliku do odczytu.\n");
+        return;
+    }
 
-void BooksMenu()
-{
+    Book book;
+    while (fread(&book, sizeof(Book), 1, file) == 1) {
+        insertAtEnd(head, book);
+    }
+
+    fclose(file);
+    printf("Dane zostały wczytane z pliku %s.\n", filename);
+}
+
+void BooksMenu(){
+    BookNode* head = NULL;
     int choice;
-    QueueBook P, K;
-    do
-    {
-        printf("Wybierz operacje:\n");
-        printf("1. Dodaj nową ksiązke\n");
-        printf("2. Usuń ksiazke\n");
-        printf("3. Edytuj\n");
-        printf("4. Wczytaj istniejące \n");
-        printf("5. Cofnij \n");
-        printf("Twoj wybor: ");
+    char filename[100];
+
+    do{
+        printf("\nMenu:\n");
+        printf("1. Dodaj książkę\n");
+        printf("2. Usuń książkę\n");
+        printf("3. Edytuj książkę\n");
+        printf("4. Wyświetl książki\n");
+        printf("5. Zapisz do pliku\n");
+        printf("6. Wczytaj z pliku\n");
+        printf("0. Wyjście\n");
+        printf("Wybierz opcję: ");
         scanf("%d", &choice);
 
-        switch (choice)
-        {
-        case 1:
+        switch (choice) {
+            case 1: {
+                Book book;
+                
+                printf("Podaj tytuł książki: ");
+                scanf("%s", book.title);
+                printf("Podaj ISBN książki: ");
+                scanf("%s", book.ISBN);
+                printf("Podaj rok wydania książki: ");
+                scanf("%d", &book.releaseYear);
+                printf("Podaj ilość książek: ");
+                scanf("%d", &book.quantity);
 
-            P = NULL;
-            readFromFileBook(&P, &K, filetitleP);
-            addBooks(&P, &K);
-            printf("\nWprowadzone dane:\n");
-            showQueueBookBook(P);
-            saveToFileBook(P, filetitleP);
-            break;
-        case 2:
-
-            break;
-        case 3:
-
-            break;
-        case 4:
-            break;
-        default:
-            printf("Nieprawidłowy wybor.\n");
-            break;
+                insertAtEnd(&head, book);
+                printf("Książka została dodana.\n");
+                break;
+            }
+            case 2: {
+                int id;
+                printf("Podaj id książki do usunięcia: ");
+                scanf("%d", &id);
+                removeById(&head, id);
+                break;
+            }
+            case 3: {
+                int id;
+                printf("Podaj id książki do edycji: ");
+                scanf("%d", &id);
+                editById(head, id);
+                break;
+            }
+            case 4:
+                displayList(head);
+                break;
+            case 5:
+           
+                saveToFileBooks(head, fileNameB);
+                break;
+            case 6:
+               
+                loadFromFile(&head, fileNameB);
+                break;
+            case 0:
+                printf("Cofam.\n");
+                break;
+            default:
+                printf("Nieprawidłowa opcja. Spróbuj ponownie.\n");
         }
-    } while (choice != 5);
+    }
+    while(choice!=0);
 }
+
