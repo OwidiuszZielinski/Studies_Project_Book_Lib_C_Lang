@@ -172,7 +172,7 @@ void OrdersMenu()
         printf("4. Wyświetl zamówienia\n");
         printf("5. Zapisz zamówienia do pliku\n");
         printf("6. Wczytaj zamówienia z pliku\n");
-        printf("0. Zakończ\n");
+        printf("0. Cofnij\n");
         printf("Wybierz opcję: ");
         scanf("%d", &option);
 

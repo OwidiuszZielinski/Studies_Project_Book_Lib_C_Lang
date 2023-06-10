@@ -141,23 +141,32 @@ void editClient(ClientNode *head, int id)
     printf("Klient o id %d została zaktualizowany.\n", id);
 }
 
-void displayClients(ClientNode *head)
-{
-    if (head == NULL)
-    {
-        printf("Lista jest pusta.\n");
+void displayClients(ClientNode* head) {
+    if (head == NULL) {
+        printf("Lista klientów jest pusta.\n");
         return;
     }
 
-    ClientNode *temp = head;
-    while (temp != NULL)
-    {
-        printf("%d %s %s %02d.%02d.%4d r.",temp->client.id, temp->client.surname, temp->client.name, temp->client.date.day, temp->client.date.month, temp->client.date.year);
-        printf("\nAdres: \n");
-        printf("%s %s %s %s\n", temp->client.address.street,temp->client.address.housenumber,temp->client.address.zip_code,temp->client.address.city);
+    ClientNode* temp = head;
+    printf("================================================ Klienci ===============================================================\n");
+    printf("|   ID   |   Nazwisko    |      Imię      |    Telefon    |   Data urodzenia  |                  Adres                 |\n");
+    printf("+--------+---------------+----------------+---------------+------------------+-----------------------------------------+\n");
+
+    while (temp != NULL) {
+        printf("| %-6d | %-13s | %-14s | %-13s | %02d.%02d.%4d        |                                       \n", temp->client.id, temp->client.surname, temp->client.name, temp->client.number, temp->client.date.day, temp->client.date.month, temp->client.date.year);
+        printf("|        |               |                |               |                   | Ulica: %s                           \n", temp->client.address.street);
+        printf("|        |               |                |               |                   |                                     \n");
+        printf("|        |               |                |               |                   | Numer domu: %s                      \n", temp->client.address.housenumber);
+        printf("|        |               |                |               |                   | Kod pocztowy: %s                    \n", temp->client.address.zip_code);
+        printf("|        |               |                |               |                   | Miasto: %s                          \n", temp->client.address.city);
+        printf("+--------+---------------+----------------+---------------+------------------+------------------------------------------+\n");
         temp = temp->next;
     }
 }
+
+
+
+
 
 void saveToFileClients(ClientNode *head, const char *filename)
 {

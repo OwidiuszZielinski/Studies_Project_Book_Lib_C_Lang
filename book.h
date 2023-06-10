@@ -109,9 +109,13 @@ void displayList(BookNode* head) {
     }
 
     BookNode* temp = head;
+    printf("========================================= Lista Książek =====================================\n");
+    printf("|   ID   |               Tytuł              |       ISBN       |   Rok Wydania   |   Ilość  |\n");
+    printf("+--------+---------------------------------+------------------+-----------------+-------------+\n");
+
     while (temp != NULL) {
-        printf("ID: %d, Tytuł: %s, ISBN: %s, Rok wydania: %d, Ilość: %d\n",
-               temp->book.id, temp->book.title, temp->book.ISBN, temp->book.releaseYear, temp->book.quantity);
+        printf("| %-6d | %-31s | %-16s | %-14d | %-11d |\n", temp->book.id, temp->book.title, temp->book.ISBN, temp->book.releaseYear, temp->book.quantity);
+        printf("+--------+---------------------------------+------------------+-----------------+-------------+\n");
         temp = temp->next;
     }
 }
